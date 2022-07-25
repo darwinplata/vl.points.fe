@@ -11,14 +11,15 @@ const initialState = {
 
 export const usePointsStore = defineStore('points', {
     state: () => ({...initialState }),
-    /* getters: {
-        isNoTrips(state) {
-            return !state.pendingTrips && state.trips.length < 1;
+    getters: {
+        getPointInfo(state) {
+            return (pointId) => {
+                return state.points.find((point) =>
+                    point.id === parseInt(pointId)
+                )
+            }
         },
-        getWalletError(state) {
-            return state.errors.message;
-        },
-    }, */
+    },
     actions: {
         async fetchAllPoints() {
             try {
@@ -32,6 +33,52 @@ export const usePointsStore = defineStore('points', {
                 } else {
                     this.points = arrPoints;
                 }
+
+                this.loading = false;
+            } catch (error) {
+                this.loading = false;
+                this.errors.message = 'Something went wrong loading points.';
+            }
+        },
+        async destroyPoint(pointId) {
+            try {
+                console.log('Parametro en el storage: ' + pointId);
+                this.loading = true;
+                this.errors.message = null;
+                const response = await api.points.deletePoint(pointId);
+                const arrPoints = await response.json();
+
+                console.log(arrPoints);
+
+                this.loading = false;
+            } catch (error) {
+                this.loading = false;
+                this.errors.message = 'Something went wrong loading points.';
+            }
+        },
+        async udpatePoint({ id, name, x, y }) {
+            try {
+                this.loading = true;
+                this.errors.message = null;
+                const response = await api.points.updatePoint({ id, name, x, y });
+                const arrPoints = await response.json();
+
+                console.log(arrPoints);
+
+                this.loading = false;
+            } catch (error) {
+                this.loading = false;
+                this.errors.message = 'Something went wrong loading points.';
+            }
+        },
+        async createPoint({ name, x, y }) {
+            try {
+                this.loading = true;
+                this.errors.message = null;
+                const response = await api.points.createPoint({ name, x, y });
+                const arrPoints = await response.json();
+
+                console.log(arrPoints);
 
                 this.loading = false;
             } catch (error) {
