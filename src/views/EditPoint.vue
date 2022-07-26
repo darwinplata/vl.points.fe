@@ -12,31 +12,47 @@
   const pointInfo = computed(() => pointsStore.getPointInfo(route.params.id));
 
   // Form: Initial values
-  const formValues = {  name: pointInfo.value.name,
+  const formValues = {  id: route.params.id,
+                        name: pointInfo.value.name,
                         x: pointInfo.value.x, 
                         y: pointInfo.value.y };
 
   const { resetForm, handleSubmit } = useForm({ initialValues: formValues });
+  const { value: idValue } = useField('id');
   const { value: nameValue } = useField('name');
   const { value: xValue } = useField('x');
   const { value: yValue } = useField('y');
 
   const isFormDirty = useIsFormDirty();
-  console.log(isFormDirty.value);
 
   // Submit form with values and update
   const submitForm = handleSubmit(async (values) => {    
-    await pointsStore.udpatePoint({ id:route.params.id, ...values });
+    await pointsStore.udpatePoint({ ...values });
     backHome();
   });
 
+  // Sorted Points 
+  const listsValues = computed(() => (
+                      { id: idValue,
+                      name: nameValue,
+                      x: xValue, 
+                      y: yValue }
+                      ));
+                      
+  const sortedPoints = computed(() => pointsStore.sortPoints(listsValues.value));
+  const halfQuantity = computed(() => Math.floor(sortedPoints.value.length/2));
+  const nearestPoints = computed(() => sortedPoints.value.slice(0,halfQuantity.value));
+  const farthestPoints = computed(() => sortedPoints.value.slice(halfQuantity.value * -1).reverse());
+
   // Reset function
-  function resetValues(){
+  function resetValues(e){
+    e.preventDefault();
     resetForm();
   }
 
   // Destroy function
-  async function deleteValue(){
+  async function deleteValue(e){
+    e.preventDefault();
     await pointsStore.destroyPoint(route.params.id);
     backHome();
   }
@@ -51,6 +67,7 @@
   <h1>Edit Point</h1>
   
   <form @submit="submitForm">
+    <input type="hidden" name="id" id="id" placeholder="Point Name" v-model="idValue" />
     <table class="table table-striped">
       <thead class="thead-light">
       <tr>
@@ -62,7 +79,7 @@
       <tr>
         <td>Name</td>
         <td>
-            <input type="text" maxlength="1" name="name" id="name" placeholder="Point Name" v-model="nameValue" />
+            <input type="text" maxlength="1" name="name" id="name" v-model="nameValue" />
         </td>
       </tr>
       <tr>
@@ -91,8 +108,8 @@
     <hr><br>
   </form>
 
-  <div id="nearest">
-  <h5>Nearest Points</h5>
+  <div>
+  <h5>Nearest point<span v-if="nearestPoints.length > 1">s</span> at distance {{ xValue }}.{{ yValue }}</h5>
   <table class="table table-striped">
     <thead class="thead-light">
     <tr>
@@ -102,15 +119,10 @@
     </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>F</td>
-        <td>6</td>
-        <td>7</td>
-      </tr>
-      <tr>
-        <td>J</td>
-        <td>2</td>
-        <td>1</td>
+      <tr v-for="point in nearestPoints" :key="point.id">
+        <td>{{ point.name }}</td>
+        <td>{{ point.x }}</td>
+        <td>{{ point.y }}</td>
       </tr>
     </tbody>
   </table>
@@ -118,7 +130,7 @@
 
   <div id="farthest">
   <br>
-  <h5>Farthest Points</h5>
+  <h5 id="hFarTitle">Farthest point<span v-if="farthestPoints.length > 1">s</span> at distance {{ xValue }}.{{ yValue }}</h5>
   <table class="table table-striped">
     <thead class="thead-light">
     <tr>
@@ -128,15 +140,10 @@
     </tr>
     </thead>
     <tbody>
-      <tr>
-        <td>F</td>
-        <td>6</td>
-        <td>7</td>
-      </tr>
-      <tr>
-        <td>J</td>
-        <td>2</td>
-        <td>1</td>
+      <tr v-for="point in farthestPoints" :key="point.id">
+        <td>{{ point.name }}</td>
+        <td>{{ point.x }}</td>
+        <td>{{ point.y }}</td>
       </tr>
     </tbody>
   </table>

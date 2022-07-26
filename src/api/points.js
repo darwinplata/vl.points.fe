@@ -22,7 +22,7 @@ const points = (apiBase) => ({
         return await fetch(`${apiBase}/points/${id}`, { method: 'POST', body: fd });
     },
     async deletePoint(pointId) {
-        return await fetch(`${apiBase}/points/${pointId}`, { method: 'DELETE' });
+        return await fetch(`${apiBase}/points/delete/${pointId}`, { method: 'POST' });
     }
 });
 

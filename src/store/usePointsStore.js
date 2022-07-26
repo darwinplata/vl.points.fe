@@ -9,14 +9,34 @@ const initialState = {
     },
 };
 
+function getDistance(x1, y1, x2, y2) {
+    let y = x2 - x1;
+    let x = y2 - y1;
+
+    return Math.sqrt(x * x + y * y);
+}
+
 export const usePointsStore = defineStore('points', {
     state: () => ({...initialState }),
     getters: {
         getPointInfo(state) {
             return (pointId) => {
-                return state.points.find((point) =>
-                    point.id === parseInt(pointId)
-                )
+                return state.points.find(function(point)  {
+                    return point.id === parseInt(pointId)
+                })
+            }
+        },
+        sortPoints(state) {
+            return function(referencePoint) {
+                return state.points.filter(function(point) {
+                        return point.id !== parseInt(referencePoint.id.value)
+                    })
+                    .map(function(point) {
+                        return {...point, distance: getDistance(referencePoint.x.value, referencePoint.y.value, point.x, point.y) }
+                    })
+                    .sort(function(pointA, pointB) {
+                        return pointA.distance - pointB.distance; //Asc
+                    })
             }
         },
     },

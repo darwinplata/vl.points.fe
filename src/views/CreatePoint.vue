@@ -22,7 +22,7 @@
   const isFormDirty = useIsFormDirty();
 
   // Submit form with values and update
-  const submitForm = handleSubmit(async (values) => {    
+  const submitFormCre = handleSubmit(async (values) => {    
     await pointsStore.createPoint({ ...values });
     pointsStore.fetchAllPoints();
     backHome();
@@ -37,7 +37,7 @@
 <template>
   <h1>Create Point</h1>
 
-   <form @submit="submitForm">
+   <form @submit="submitFormCre">
     <table class="table table-striped">
       <thead class="thead-light">
       <tr>
