@@ -40,9 +40,16 @@
                       ));
                       
   const sortedPoints = computed(() => pointsStore.sortPoints(listsValues.value));
-  const halfQuantity = computed(() => Math.floor(sortedPoints.value.length/2));
-  const nearestPoints = computed(() => sortedPoints.value.slice(0,halfQuantity.value));
-  const farthestPoints = computed(() => sortedPoints.value.slice(halfQuantity.value * -1).reverse());
+  
+  const nearestDistance = sortedPoints.value[0].distance;
+  const fartherDistance = sortedPoints.value[sortedPoints.value.length - 1].distance;
+
+  const nearestPoints = computed(() => sortedPoints.value.filter(function(point) {
+                          return point.distance === nearestDistance
+                        }));
+  const farthestPoints = computed(() => sortedPoints.value.filter(function(point) {
+                          return point.distance === fartherDistance
+                        }));
 
   // Reset function
   function resetValues(e){
@@ -109,7 +116,7 @@
   </form>
 
   <div>
-  <h5>Nearest point<span v-if="nearestPoints.length > 1">s</span> at distance {{ xValue }}.{{ yValue }}</h5>
+  <h5>Nearest point<span v-if="nearestPoints.length > 1">s</span> at distance {{ nearestDistance }}</h5>
   <table class="table table-striped">
     <thead class="thead-light">
     <tr>
@@ -130,7 +137,7 @@
 
   <div id="farthest">
   <br>
-  <h5 id="hFarTitle">Farthest point<span v-if="farthestPoints.length > 1">s</span> at distance {{ xValue }}.{{ yValue }}</h5>
+  <h5 id="hFarTitle">Farthest point<span v-if="farthestPoints.length > 1">s</span> at distance {{ fartherDistance }}</h5>
   <table class="table table-striped">
     <thead class="thead-light">
     <tr>

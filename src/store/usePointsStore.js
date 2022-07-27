@@ -13,7 +13,7 @@ function getDistance(x1, y1, x2, y2) {
     let y = x2 - x1;
     let x = y2 - y1;
 
-    return Math.sqrt(x * x + y * y);
+    return (Math.sqrt(x * x + y * y)).toFixed(1);
 }
 
 export const usePointsStore = defineStore('points', {
@@ -28,7 +28,8 @@ export const usePointsStore = defineStore('points', {
         },
         sortPoints(state) {
             return function(referencePoint) {
-                return state.points.filter(function(point) {
+                return state.points
+                    .filter(function(point) {
                         return point.id !== parseInt(referencePoint.id.value)
                     })
                     .map(function(point) {
